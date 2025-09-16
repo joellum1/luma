@@ -8,6 +8,7 @@ interface Props {
 
 export const PrivateRoute: React.FC<Props> = ({ children }) => {
   const { user } = useContext(AuthContext);
+  console.log("PrivateRoute user:", user);
 
   if (!user) {
     return <Navigate to="/login" replace />;

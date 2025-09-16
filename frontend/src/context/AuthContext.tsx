@@ -1,45 +1,53 @@
-import React, { createContext, useState, useEffect, type ReactNode } from "react";
-import { type AuthResponse } from "../types";
-import { logoutUser } from "../api/auth";
+import { createContext, useState, useEffect, type ReactNode } from "react";
 
 interface AuthContextType {
   user: string | null;
-  setUser: (username: string | null) => void;
-  logout: () => Promise<void>;
+  token: string | null;   // JWT access token
+  login: (username: string, token: string) => void;
+  logout: () => void;
 }
 
 export const AuthContext = createContext<AuthContextType>({
   user: null,
-  setUser: () => {},
-  logout: async () => {},
+  token: null,
+  login: () => {},
+  logout: () => {},
 });
 
-interface Props {
-  children: ReactNode;
-}
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const storedUser = localStorage.getItem("user");
+  const storedToken = localStorage.getItem("token");
 
-export const AuthProvider: React.FC<Props> = ({ children }) => {
-  const [user, setUser] = useState<string | null>(null);
+  const [user, setUser] = useState<string | null>(storedUser);
+  const [token, setToken] = useState<string | null>(storedToken);
 
-  // Optionally fetch current user from backend on mount
+  // Save to localStorage whenever user or token changes
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/users/current/", {
-      credentials: "include",
-    })
-      .then((res) => res.json())
-      .then((data: AuthResponse) => {
-        if (data.username) setUser(data.username);
-      })
-      .catch(() => setUser(null));
-  }, []);
+    if (user && token) {
+      localStorage.setItem("user", user);
+      localStorage.setItem("token", token);
+    } else {
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+    }
+  }, [user, token]);
 
-  const logout = async () => {
-    await logoutUser();
+  const login = (username: string, newToken: string) => {
+    setUser(username);
+    setToken(newToken);
+    localStorage.setItem("user", username);
+    localStorage.setItem("token", newToken);
+  };
+
+  const logout = () => {
     setUser(null);
+    setToken(null);
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
   };
 
   return (
-    <AuthContext.Provider value={{ user, setUser, logout }}>
+    <AuthContext.Provider value={{ user, token, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

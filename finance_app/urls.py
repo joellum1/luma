@@ -27,9 +27,7 @@ from .views import home
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    path('', home, name='home'),    # Root just returns JSON
     path('users/', include('users.urls')),      # User-related API endpoints
-    path('transactions/', include('transactions.urls')),    # Transactions pages or extra APIs
     path('api/', include('transactions.api_urls')),     # API-specific endpoints
 
     # JWT token endpoints

@@ -1,42 +1,40 @@
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.csrf import csrf_exempt
-from django.http import JsonResponse
-
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import AllowAny
 
-import json
+class RegisterAPI(APIView):
+    permission_classes = [AllowAny]
 
-@api_view(['POST'])
-@permission_classes([AllowAny])
-def register_api(request):
-    """
-    Create a new user.
-    """
+    def post(self, request):
+        username = request.data.get("username")
+        email = request.data.get("email")
+        password = request.data.get("password")
 
-    if request.method != "POST": return JsonResponse({"error": "POST required"}, status=400)
+        if not username or not email or not password:
+            return Response({"error": "All fields are required."}, status=status.HTTP_400_BAD_REQUEST)
 
-    data = json.loads(request.body)
-    username = data.get("username")
-    email = data.get("email")
-    password = data.get("password")
+        if User.objects.filter(username=username).exists():
+            return Response({"error": "Username already taken."}, status=status.HTTP_400_BAD_REQUEST)
 
-    if User.objects.filter(username=username).exists(): return JsonResponse({"error": "Username already exists"}, status=400)
+        if User.objects.filter(email=email).exists():
+            return Response({"error": "Email already registered."}, status=status.HTTP_400_BAD_REQUEST)
 
-    user = User.objects.create_user(username=username, email=email, password=password)
+        try:
+            validate_password(password)
+        except ValidationError as e:
+            return Response({"error": list(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-    res = {
-        "message": "User created successfully",
-        "username": user.username
-    }
+        user = User.objects.create_user(username=username, email=email, password=password)
 
-    return JsonResponse(res, status=201)
-
-
-@login_required
-def current_user(request):
-    return JsonResponse({"username": request.user.username})
+        return Response(
+            {
+                "message": "User registered successfully",
+                "username": user.username,
+                "email": user.email,
+            },
+            status=status.HTTP_201_CREATED,
+        )
