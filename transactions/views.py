@@ -1,10 +1,14 @@
 from django.shortcuts import render, redirect
-from .forms import TransactionForm
-from .models import Transaction
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
 
 from rest_framework import generics, permissions
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+
+from .forms import TransactionForm
+from .models import Transaction
 from .serializers import TransactionSerializer
 
 @login_required
@@ -49,3 +53,25 @@ class TransactionListCreateAPI(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         # Automatically assign the logged-in user
         serializer.save(user=self.request.user)
+
+class DashboardAPI(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        transactions = Transaction.objects.filter(user=request.user)
+
+        income_total = transactions.filter(transaction_type='INCOME').aggregate(Sum('amount'))['amount__sum'] or 0
+        expense_total = transactions.filter(transaction_type='EXPENSE').aggregate(Sum('amount'))['amount__sum'] or 0
+        balance = income_total - expense_total
+
+        # Optional: totals per category
+        category_totals = transactions.values('category').annotate(total=Sum('amount'))
+
+        data = {
+            'income_total': income_total,
+            'expense_total': expense_total,
+            'balance': balance,
+            'category_totals': list(category_totals),
+        }
+        
+        return Response(data)
