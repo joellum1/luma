@@ -1,0 +1,10 @@
+<h2>Your Transactions</h2>
+<a href="{% url 'transaction_create' %}">Add New Transaction</a>
+<ul>
+  {% for t in transactions %}
+    <li>{{ t.date }} - {{ t.transaction_type }} - ${{ t.amount }} - {{ t.category }}</li>
+  {% empty %}
+    <li>No transactions yet.</li>
+  {% endfor %}
+</ul>
+<a href="{% url 'logout' %}">Logout</a>
