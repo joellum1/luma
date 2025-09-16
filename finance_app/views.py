@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.http import HttpResponseNotFound
 
 def home(request):
-    return render(request, 'home.html')
+    return HttpResponseNotFound("Frontend handles routing now.")

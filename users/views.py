@@ -1,43 +1,42 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth import login, logout, authenticate
-from django.contrib.auth.forms import AuthenticationForm
-from .forms import UserRegisterForm
-from .models import UserProfile
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
 
-def register_view(request):
-    if request.method == 'POST':
-        form = UserRegisterForm(request.POST)
-        if form.is_valid():
-            user = form.save(commit=False)
-            user.set_password(form.cleaned_data['password'])
-            user.save()
-            # Create a user profile
-            UserProfile.objects.create(user=user)
-            login(request, user)
-            return redirect('home')  # Change 'home' to your dashboard later
-    else:
-        form = UserRegisterForm()
-    return render(request, 'users/register.html', {'form': form})
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from rest_framework import status
 
-def login_view(request):
-    next_url = request.GET.get('next', '')  # capture ?next=/page/
+import json
 
-    if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
-        next_url = request.POST.get('next', '')  # capture hidden next field
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def register_api(request):
+    """
+    Create a new user.
+    """
 
-        if form.is_valid():
-            user = form.get_user()
-            login(request, user)
+    if request.method != "POST": return JsonResponse({"error": "POST required"}, status=400)
 
-            if next_url: return redirect(next_url)
+    data = json.loads(request.body)
+    username = data.get("username")
+    email = data.get("email")
+    password = data.get("password")
 
-            return redirect('home')
-    else:
-        form = AuthenticationForm()
+    if User.objects.filter(username=username).exists(): return JsonResponse({"error": "Username already exists"}, status=400)
 
-    return render(request, 'users/login.html', {'form': form, 'next': next_url})
+    user = User.objects.create_user(username=username, email=email, password=password)
 
-def logout_view(request):
-    logout(request)
-    return redirect('login')
+    res = {
+        "message": "User created successfully",
+        "username": user.username
+    }
+
+    return JsonResponse(res, status=201)
+
+
+@login_required
+def current_user(request):
+    return JsonResponse({"username": request.user.username})
