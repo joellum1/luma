@@ -130,5 +130,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ----------------------------------------------------------------
 
-# Redirect @login_required to your login page
-LOGIN_URL = '/users/login/'
+LOGIN_URL = '/users/login/'     # where @login_required redirects if not logged in
+LOGIN_REDIRECT_URL = ''         # default redirect to home page after login
