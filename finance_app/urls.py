@@ -16,8 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from .views import home
 
 urlpatterns = [
+    path('', home, name='home'),  # Root URL shows home page
     path('admin/', admin.site.urls),
     path('users/', include('users.urls')),
+    path('transactions/', include('transactions.urls')),
 ]
