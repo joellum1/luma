@@ -38,6 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # Django REST Framework (DRF)
+    'rest_framework',
+
     # added apps
     'users',
     'transactions',

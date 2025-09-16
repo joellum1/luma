@@ -4,6 +4,9 @@ from .models import Transaction
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
 
+from rest_framework import generics, permissions
+from .serializers import TransactionSerializer
+
 @login_required
 def transaction_list(request):
     transactions = Transaction.objects.filter(user=request.user).order_by('-date')
@@ -34,3 +37,15 @@ def transaction_create(request):
     else:
         form = TransactionForm()
     return render(request, 'transactions/transaction_form.html', {'form': form})
+
+class TransactionListCreateAPI(generics.ListCreateAPIView):
+    serializer_class = TransactionSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # Only return transactions for the logged-in user
+        return Transaction.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        # Automatically assign the logged-in user
+        serializer.save(user=self.request.user)
