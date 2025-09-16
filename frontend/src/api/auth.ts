@@ -1,4 +1,4 @@
-import { type AuthResponse, type LoginPayload, type RegisterPayload } from "../types";
+import { type LoginPayload, type RegisterPayload } from "../types";
 
 const BASE_URL = "http://127.0.0.1:8000/";
 
@@ -39,12 +39,3 @@ export async function loginUser(payload: LoginPayload) {
     return { error: "Something went wrong. Please try again." };
   }
 }
-
-// export async function logoutUser(): Promise<AuthResponse> {
-//   const res = await fetch(BASE_URL + "users/logout/", {
-//     method: "POST",
-//     credentials: "include",
-//   });
-  
-//   return res.json();
-// }
