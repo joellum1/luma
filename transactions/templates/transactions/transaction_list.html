@@ -1,4 +1,9 @@
 <h2>Your Transactions</h2>
+
+<p><strong>Total Income:</strong> ${{ income_total }}</p>
+<p><strong>Total Expenses:</strong> ${{ expense_total }}</p>
+<p><strong>Balance:</strong> ${{ balance }}</p>
+
 <a href="{% url 'transaction_create' %}">Add New Transaction</a>
 <ul>
   {% for t in transactions %}
@@ -7,4 +12,5 @@
     <li>No transactions yet.</li>
   {% endfor %}
 </ul>
+
 <a href="{% url 'logout' %}">Logout</a>
