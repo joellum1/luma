@@ -24,6 +24,13 @@ class TransactionListCreateAPI(generics.ListCreateAPIView):
         # Automatically assign the logged-in user
         serializer.save(user=self.request.user)
 
+class TransactionRetrieveUpdateDestroyAPI(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Transaction.objects.all()
+    serializer_class = TransactionSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Transaction.objects.filter(user=self.request.user)
 
 class DashboardAPI(APIView):
     """

@@ -1,5 +1,7 @@
+import { BASE_URL } from "./constants";
+
 export async function fetchDashboard() {
-  const res = await fetch("http://127.0.0.1:8000/api/dashboard/", {
+  const res = await fetch(BASE_URL + "api/dashboard/", {
     credentials: "include",
   });
   return res.json();

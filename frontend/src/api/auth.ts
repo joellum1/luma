@@ -1,6 +1,5 @@
 import { type LoginPayload, type RegisterPayload } from "../types";
-
-const BASE_URL = "http://127.0.0.1:8000/";
+import { BASE_URL } from "./constants";
 
 export async function registerUser(payload: RegisterPayload) {
   try {
