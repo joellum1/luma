@@ -1,8 +1,14 @@
 import { BASE_URL } from "./constants";
 
-export async function fetchDashboard() {
-  const res = await fetch(BASE_URL + "api/dashboard/", {
-    credentials: "include",
-  });
-  return res.json();
+import { useApiClient } from "./client";
+import type { DashboardData } from "../types";
+
+const DASHBOARD_URL = BASE_URL + "api/dashboard/";
+
+export const useDashboardApi = () => {
+  const { authFetch } = useApiClient();
+
+  return {
+    getDashboard: async (): Promise<DashboardData> => authFetch(DASHBOARD_URL, { method: "GET" }),
+  };
 }

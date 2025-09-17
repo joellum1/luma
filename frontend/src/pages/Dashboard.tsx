@@ -1,9 +1,11 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Legend } from "recharts";
 
-import { DashboardContext } from "../context/DashboardContext";
 import { Navbar } from "../components/Navbar";
+import { useDashboardApi } from "../api/dashboard";
+
+import type { DashboardData } from "../types";
 
 // Reusable component for summary card
 const SummaryCard = ({ title, value, colour }: { title: string; value: number; colour: string }) => (
@@ -14,7 +16,19 @@ const SummaryCard = ({ title, value, colour }: { title: string; value: number; c
 );
 
 export default function Dashboard() {
-  const { data, loading, error } = useContext(DashboardContext);
+  const { getDashboard } = useDashboardApi();
+
+  const [data, setData] = useState<DashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    getDashboard()
+      .then((d) => setData(d))
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, []);
+
 
   if (loading) return <p className="p-8">Loading dashboard...</p>;
   if (error) return <p className="p-8 text-red-500">{error}</p>;

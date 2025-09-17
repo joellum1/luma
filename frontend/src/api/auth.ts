@@ -1,40 +1,53 @@
-import { type LoginPayload, type RegisterPayload } from "../types";
 import { BASE_URL } from "./constants";
 
-export async function registerUser(payload: RegisterPayload) {
-  try {
-    const res = await fetch(BASE_URL + "users/register/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+import { useApiClient } from "./client";
+import type { User } from "../types";
 
-    if (!res.ok) {
-      return { error: "Registration failed" };
-    }
+const REGISTER_URL = BASE_URL + "users/register/";
+const TOKEN_URL = BASE_URL + "api/token/";
+const REFRESH_URL = BASE_URL + "api/token/refresh/";
 
-    const data = await res.json();
-    return data; // should return user info if backend is set up like that
-  } catch {
-    return { error: "Something went wrong. Please try again." };
-  }
-}
+export const useAuthApi = () => {
+  const { authFetch } = useApiClient();
 
-export async function loginUser(payload: LoginPayload) {
-  try {
-    const res = await fetch(BASE_URL + "api/token/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+  return {
+    registerUser: async (data: { username: string; email: string; password: string }): Promise<User> => {
+      const res = await fetch(REGISTER_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
 
-    if (!res.ok) {
-      return { error: "Invalid credentials" };
-    }
+      if (!res.ok) throw new Error("Failed to register user");
 
-    const data = await res.json();
-    return { access: data.access, refresh: data.refresh };
-  } catch {
-    return { error: "Something went wrong. Please try again." };
-  }
+      return res.json();
+    },
+
+    loginUser: async (data: { username: string; password: string }) => {
+      const res = await fetch(TOKEN_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (!res.ok) throw new Error("Login failed");
+
+      return res.json(); // returns { access, refresh }
+    },
+
+    refreshToken: async (refresh: string) => {
+      const res = await fetch(REFRESH_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refresh }),
+      });
+
+      if (!res.ok) throw new Error("Refresh token failed");
+
+      return res.json(); // returns { access }
+    },
+
+    // protected user call (requires authFetch)
+    getProfile: async (): Promise<User> => authFetch(BASE_URL + "api/users/profile/", { method: "GET" }),
+  };
 }

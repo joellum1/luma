@@ -1,20 +1,6 @@
 import { BASE_URL } from "../api/constants";
 import { createContext, useState, useEffect, useCallback, type ReactNode } from "react";
-
-interface AuthContextType {
-  user: string | null;
-
-  accessToken: string | null;   // JWT access token
-  refreshToken: string | null;
-
-  loading: boolean;
-  isAuthenticated: boolean;
-
-  login: (username: string, access: string, refresh: string) => void;
-  logout: () => void;
-
-  refreshAccessToken: () => Promise<boolean>;
-}
+import { type AuthContextType } from "../types";
 
 export const AuthContext = createContext<AuthContextType>({
   user: null,

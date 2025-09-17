@@ -7,11 +7,11 @@ import { TransactionRow } from "../components/TransactionRow";
 import { Navbar } from "../components/Navbar";
 
 import { type Transaction } from "../types/transaction";
-import { fetchTransactions, createTransaction, updateTransaction, deleteTransaction } from "../api/transactions";
+import { useTransactionsApi } from "../api/transactions";
 
 export default function Transactions() {
-  const { accessToken, refreshAccessToken } = useContext(AuthContext);
   const { refreshDashboard } = useContext(DashboardContext);
+  const { getTransactions, createTransaction, updateTransaction, deleteTransaction } = useTransactionsApi();
 
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
@@ -19,41 +19,20 @@ export default function Transactions() {
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
 
   useEffect(() => {
-    const loadTransactions = async () => {
-      if (!accessToken) return;
-
-      try {
-        let data = await fetchTransactions(accessToken);
-
-        // If unauthorized, try refreshing access token once
-        if (!data && (await refreshAccessToken())) {
-          const newAccess = localStorage.getItem("access_token");
-          if (newAccess) {
-            data = await fetchTransactions(newAccess);
-          }
-        }
-
-        setTransactions(data || []);
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    void loadTransactions();
-  }, [accessToken, refreshAccessToken]);
+    getTransactions()
+      .then(setTransactions)
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, []);
 
   const handleSubmit = async (data: Omit<Transaction, "id" | "user" | "date">) => {
-    if (!accessToken) return;
-
     try {
       if (editingTransaction) {
-        const updated = await updateTransaction(accessToken, editingTransaction.id, data);
+        const updated = await updateTransaction(editingTransaction.id, data);
         setTransactions(transactions.map(t => t.id === updated.id ? updated : t));
         setEditingTransaction(null);
       } else {
-        const newTransaction = await createTransaction(accessToken, data);
+        const newTransaction = await createTransaction(data);
         setTransactions([newTransaction, ...transactions]);
       }
 
@@ -66,10 +45,10 @@ export default function Transactions() {
   const handleEdit = (t: Transaction) => setEditingTransaction(t);
 
   const handleDelete = async (id: number) => {
-    if (!accessToken || !confirm("Are you sure you want to delete this transaction?")) return;
+    if (!confirm("Are you sure you want to delete this transaction?")) return;
 
     try {
-      await deleteTransaction(accessToken, id);
+      await deleteTransaction(id);
       setTransactions(transactions.filter(t => t.id !== id));
 
       refreshDashboard();

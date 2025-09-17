@@ -1,37 +1,39 @@
 import { useState, type FormEvent, useContext } from "react";
-import { registerUser, loginUser } from "../api/auth";
-import { type RegisterPayload, type LoginPayload } from "../types";
 import { useNavigate } from "react-router-dom";
+
 import { AuthContext } from "../context/AuthContext";
+import { useAuthApi } from "../api/auth";
+
+import type { RegisterPayload } from "../types";
 
 export default function Register() {
+  const navigate = useNavigate();
+
   const [username, setUsername] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
-  const navigate = useNavigate();
+
   const { login } = useContext(AuthContext);
+
+  const { registerUser, loginUser } = useAuthApi();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     const payload: RegisterPayload = { username, email, password };
-    const result = await registerUser(payload);
 
-    if (result.error) {
-      setError(result.error);
-      return;
-    }
+    try {
+      // 1️⃣ Register user
+      await registerUser(payload);
 
-    // If registration succeeds, immediately log in
-    const loginPayload: LoginPayload = { username, password };
-    const auth = await loginUser(loginPayload);
+      // 2️⃣ Log in immediately
+      const auth = await loginUser({ username, password });
 
-    if (auth.error) {
-      setError(auth.error);
-    } else if (auth.access) {
-      login(username, auth.access); // save token + user
+      login(username, auth.access, auth.refresh);
       navigate("/"); // redirect to Dashboard
+    } catch (err: any) {
+      setError(err.message || "Registration failed");
     }
   };
 

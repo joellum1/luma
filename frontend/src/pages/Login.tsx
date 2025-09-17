@@ -1,15 +1,21 @@
-import { useState, type FormEvent, useContext } from "react";
-import { loginUser } from "../api/auth";
-import { type LoginPayload } from "../types";
+import { useState, useContext, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
+
 import { AuthContext } from "../context/AuthContext";
+import { useAuthApi } from "../api/auth";
+
+import type { LoginPayload } from "../types";
 
 export default function Login() {
+  const navigate = useNavigate();
+
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
-  const navigate = useNavigate();
+  
   const { login } = useContext(AuthContext); // grab login from context
+
+  const { loginUser } = useAuthApi();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();

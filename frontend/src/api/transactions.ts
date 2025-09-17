@@ -1,64 +1,42 @@
 import { BASE_URL } from "./constants";
-import { type Transaction } from "../types/transaction";
 
-// Fetch all transactions
-export const fetchTransactions = async (token: string): Promise<Transaction[]> => {
-  const res = await fetch(BASE_URL + "api/transactions/", {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+import { useApiClient } from "./client";
+import type { Transaction } from "../types/transaction";
 
-  if (!res.ok) throw new Error("Failed to fetch transactions");
+const TRANSACTIONS_URL = BASE_URL + "api/transactions/";
 
-  return res.json();
-};
+export const useTransactionsApi = () => {
+  const { authFetch } = useApiClient();
 
-// Create a new transaction
-export const createTransaction = async (
-    token: string, 
-    data: Omit<Transaction, "id" | "user" | "date">
-) => {
-  const res = await fetch(BASE_URL + "api/transactions/", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
+  return {
+    // Fetch all transactions
+    getTransactions: async (): Promise<Transaction[]> => {
+      return authFetch(TRANSACTIONS_URL, { method: "GET" });
     },
-    body: JSON.stringify(data),
-  });
 
-  if (!res.ok) throw new Error("Failed to create transaction");
+    // Create a new transaction
+    createTransaction: async (data: Omit<Transaction, "id" | "user" | "date">) => {
+      return authFetch(TRANSACTIONS_URL, {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
+    },
 
-  return res.json();
-};
+    // Update a transaction
+    updateTransaction: async (
+      id: number,
+      data: Partial<Omit<Transaction, "id" | "user" | "date">>
+    ) => {
+      return authFetch(TRANSACTIONS_URL + `${id}/`, {
+        method: "PATCH",
+        body: JSON.stringify(data),
+      });
+    },
 
-// Update a transaction
-export const updateTransaction = async (
-  token: string,
-  id: number,
-  data: Partial<Omit<Transaction, "id" | "user" | "date">>
-) => {
-  const res = await fetch(BASE_URL + `api/transactions/${id}/`, {
-    method: "PATCH",
-    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
-
-  if (!res.ok) throw new Error("Failed to update transaction");
-
-  return res.json();
-};
-
-// Delete a transaction
-export const deleteTransaction = async (
-    token: string, 
-    id: number
-) => {
-  const res = await fetch(BASE_URL + `api/transactions/${id}/`, {
-    method: "DELETE",
-    headers: { Authorization: `Bearer ${token}` },
-  });
-
-  if (!res.ok) throw new Error("Failed to delete transaction");
-  
-  return true;
-};
+    // Delete a transaction
+    deleteTransaction: async (id: number) => {
+      await authFetch(TRANSACTIONS_URL + `${id}/`, { method: "DELETE" });
+      return true;
+    },
+  };
+}
