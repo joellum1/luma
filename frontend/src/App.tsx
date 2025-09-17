@@ -6,8 +6,6 @@ import { AuthProvider } from "./context/AuthContext";
 import { DashboardProvider } from "./context/DashboardContext";
 
 import Landing from './pages/Landing';
-import Register from "./pages/Register";
-import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Transactions from "./pages/Transactions";
 
@@ -19,8 +17,6 @@ function App() {
           <Routes>
             {/* Public Routes */}
             <Route path="/" element={<Landing />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/login" element={<Login />} />
 
             {/* Protected Routes */}
             <Route 
