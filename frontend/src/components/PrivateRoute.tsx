@@ -1,18 +1,20 @@
-import React, { useContext, type ReactNode } from "react";
+import { useContext, type ReactNode } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { Navigate } from "react-router-dom";
 
-interface Props {
-  children: ReactNode;
-}
+export const PrivateRoute = ({ children }: { children: ReactNode }) => {
+  const { loading, isAuthenticated } = useContext(AuthContext);
 
-export const PrivateRoute: React.FC<Props> = ({ children }) => {
-  const { user } = useContext(AuthContext);
-  console.log("PrivateRoute user:", user);
+  // While the AuthProvider is checking/refreshing tokens, show a loading state
+  if (loading) {
+    return <div className="p-8">Checking authentication...</div>;
+  }
 
-  if (!user) {
+  if (!isAuthenticated) {
+    // Not authenticated -> redirect to login
     return <Navigate to="/login" replace />;
   }
 
+  // Authenticated -> render the page
   return children;
 };

@@ -20,7 +20,7 @@ export default function Login() {
       setError(data.error);
     } else if (data.access) {
       // save to context + localStorage
-      login(username, data.access);
+      login(username, data.access, data.refresh);
       navigate("/");
     }
   };

@@ -15,23 +15,50 @@ export const DashboardContext = createContext<DashboardContextType>({
   data: null,
   loading: true,
   error: null,
-  refreshDashboard: () => {},
+  refreshDashboard: async () => {},
 });
 
 export const DashboardProvider = ({ children }: { children: ReactNode }) => {
-  const { token } = useContext(AuthContext);
+  const { accessToken, loading: authLoading, refreshAccessToken } = useContext(AuthContext);
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchDashboard = async () => {
-    if (!token) return;
+    if (!accessToken) {
+      setData(null);
+      setLoading(false);
+      return;
+    }
     
     setLoading(true);
     try {
       const res = await fetch(BASE_URL + "api/dashboard/", {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${accessToken}` },
       });
+
+      // If access was invalid (401) try to refresh once, then retry
+      if (res.status === 401) {
+        const refreshed = await refreshAccessToken();
+        if (refreshed) {
+          // try again with new token from localStorage
+          const newAccess = localStorage.getItem("access_token");
+
+          if (!newAccess) throw new Error("Unable to refresh token");
+
+          const retry = await fetch(BASE_URL + "api/dashboard/", {
+            headers: { Authorization: `Bearer ${newAccess}` },
+          });
+
+          if (!retry.ok) throw new Error("Failed to fetch dashboard after refresh");
+
+          const json = await retry.json();
+          setData(json);
+          setError(null);
+          return;
+        }
+        throw new Error("Unauthorized");
+      }
 
       if (!res.ok) throw new Error("Failed to fetch dashboard data");
 
@@ -46,9 +73,11 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  useEffect(() => {
-    fetchDashboard();
-  }, [token]);
+    // Wait until auth provider finishes initialization before fetching
+    useEffect(() => {
+      if (authLoading) return;
+      void fetchDashboard();
+    }, [authLoading, accessToken]);
 
   return (
     <DashboardContext.Provider value={{ data, loading, error, refreshDashboard: fetchDashboard }}>

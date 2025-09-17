@@ -26,7 +26,14 @@ function App() {
                 </PrivateRoute>
               } 
             />
-            <Route path="/transactions" element={<Transactions />} />
+            <Route 
+              path="/transactions" 
+              element={
+                <PrivateRoute>
+                  <Transactions />
+                </PrivateRoute>
+              } 
+            />
           </Routes>
         </Router>
       </DashboardProvider>
