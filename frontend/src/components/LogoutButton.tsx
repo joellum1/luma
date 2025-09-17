@@ -8,7 +8,7 @@ export const LogoutButton = () => {
 
   const handleLogout = () => {
     logout();
-    navigate("/login"); // redirect to login after logout
+    navigate("/"); // redirect to landing page after logout
   };
 
   return (

@@ -31,7 +31,7 @@ export default function Register() {
       const auth = await loginUser({ username, password });
 
       login(username, auth.access, auth.refresh);
-      navigate("/"); // redirect to Dashboard
+      navigate("/dashboard"); // redirect to Dashboard
     } catch (err: any) {
       setError(err.message || "Registration failed");
     }

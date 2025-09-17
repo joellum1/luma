@@ -5,6 +5,7 @@ import { PrivateRoute } from "./components/PrivateRoute";
 import { AuthProvider } from "./context/AuthContext";
 import { DashboardProvider } from "./context/DashboardContext";
 
+import Landing from './pages/Landing';
 import Register from "./pages/Register";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
@@ -16,10 +17,14 @@ function App() {
       <DashboardProvider>
         <Router>
           <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<Landing />} />
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
+
+            {/* Protected Routes */}
             <Route 
-              path="/" 
+              path="/dashboard" 
               element={
                 <PrivateRoute>
                   <Dashboard />

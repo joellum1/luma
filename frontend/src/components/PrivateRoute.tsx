@@ -11,8 +11,8 @@ export const PrivateRoute = ({ children }: { children: ReactNode }) => {
   }
 
   if (!isAuthenticated) {
-    // Not authenticated -> redirect to login
-    return <Navigate to="/login" replace />;
+    // Not authenticated -> redirect to landing
+    return <Navigate to="/" replace />;
   }
 
   // Authenticated -> render the page

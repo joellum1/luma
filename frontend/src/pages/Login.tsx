@@ -27,7 +27,7 @@ export default function Login() {
     } else if (data.access) {
       // save to context + localStorage
       login(username, data.access, data.refresh);
-      navigate("/");
+      navigate("/dashboard");
     }
   };
 
