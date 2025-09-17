@@ -1,8 +1,8 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Legend } from "recharts";
 
-import { Navbar } from "../components/Navbar";
+import Navbar from "../components/Navbar";
 import { useDashboardApi } from "../api/dashboard";
 
 import type { DashboardData } from "../types";

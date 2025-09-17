@@ -1,10 +1,9 @@
 import { useContext, useEffect, useState } from "react";
-import { AuthContext } from "../context/AuthContext";
 import { DashboardContext } from "../context/DashboardContext";
 
 import { TransactionForm } from "../components/TransactionForm";
 import { TransactionRow } from "../components/TransactionRow";
-import { Navbar } from "../components/Navbar";
+import Navbar from "../components/Navbar";
 
 import { type Transaction } from "../types/transaction";
 import { useTransactionsApi } from "../api/transactions";
