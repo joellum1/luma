@@ -140,7 +140,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       // else try refresh (if we have refresh)
       if (refreshToken) {
-        const ok = await refreshAccessToken();
+        await refreshAccessToken();
         if (mounted) setLoading(false);
         return;
       }

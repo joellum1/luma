@@ -2,7 +2,6 @@ import { useContext } from "react";
 
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Legend } from "recharts";
 
-import { type Category } from "../types";
 import { DashboardContext } from "../context/DashboardContext";
 import { Navbar } from "../components/Navbar";
 
@@ -12,18 +11,6 @@ const SummaryCard = ({ title, value, colour }: { title: string; value: number; c
     <h2 className="font-semibold text-lg">{title}</h2>
     <p className="text-xl">${value}</p>
   </div>
-);
-
-// Reusable component for category list
-const CategoryList = ({ categories }: { categories: Category[] }) => (
-  <ul className="space-y-1">
-    {categories.map((cat, idx) => (
-      <li key={idx} className="p-2 border rounded flex justify-between">
-        <span>{cat.category}</span>
-        <span>${cat.total}</span>
-      </li>
-    ))}
-  </ul>
 );
 
 export default function Dashboard() {
