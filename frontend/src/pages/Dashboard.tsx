@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Legend } from "recharts";
 
-import Navbar from "../components/Navbar";
+import SideMenu from "../components/SideMenu";
 import { useDashboardApi } from "../api/dashboard";
 
 import type { DashboardData } from "../types";
@@ -43,7 +43,7 @@ export default function Dashboard() {
 
   return (
     <div className="p-8 max-w-3xl mx-auto">
-      <Navbar />
+      <SideMenu />
 
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Dashboard</h1>

@@ -3,7 +3,7 @@ import { DashboardContext } from "../context/DashboardContext";
 
 import { TransactionForm } from "../components/TransactionForm";
 import { TransactionRow } from "../components/TransactionRow";
-import Navbar from "../components/Navbar";
+import SideMenu from "../components/SideMenu";
 
 import { type Transaction } from "../types/transaction";
 import { useTransactionsApi } from "../api/transactions";
@@ -61,7 +61,7 @@ export default function Transactions() {
 
   return (
     <div className="p-8 max-w-3xl mx-auto">
-      <Navbar />
+      <SideMenu />
       
       <h1 className="text-2xl font-bold mb-4">Transactions</h1>
 

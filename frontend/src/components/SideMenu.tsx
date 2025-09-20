@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 import { AuthContext } from "../context/AuthContext";
 
-export default function Navbar() {
+export default function SideMenu() {
   const navigate = useNavigate();
 
   const { logout } = useContext(AuthContext);
@@ -18,7 +18,7 @@ export default function Navbar() {
     setIsProfileOpen(!isProfileOpen);
   };
 
-  const [_, setIsHovered] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   const handleMouseEnter = () => {
     setIsHovered(true);
   };
@@ -30,15 +30,24 @@ export default function Navbar() {
   return (
     // Collapsible Sidebar for Logged-In Pages (icons only, expands on hover)
     <nav 
-      className="group fixed top-0 left-0 h-full w-12 bg-gray-800 text-white flex flex-col py-4 transition-all duration-300 ease-in-out hover:w-48"
+      className={`py-4 fixed top-0 left-0 h-full flex flex-col
+        transition-all duration-300 ease-in-out 
+        box-border border-r border-gray-200 shadow-sm
+        ${isHovered ? 'w-48' : 'w-12'}`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
       {/* Logo/Icon at top */}
-      <Link to="/dashboard" className="flex items-center justify-center mb-8 p-2 rounded hover:bg-gray-700 transition-colors">
-        <span className="ml-3 truncate group-hover:ml-3 opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap">
-          Luma
-        </span>
+      <Link 
+        to="/dashboard" 
+        className={`flex items-center ${!isHovered ? "justify-center" : ""} mb-8 p-2 rounded 
+          hover:bg-gray-700 transition-colors`}>
+        <div className="flex ">
+          <i>L</i>
+          <span className={`ml-3 truncate ${!isHovered ? "hidden" : ""} transition-all whitespace-nowrap`}>
+            Luma
+          </span>
+        </div>
       </Link>
 
       {/* Navigation Links */}
