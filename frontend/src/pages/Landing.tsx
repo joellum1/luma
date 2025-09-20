@@ -64,7 +64,7 @@ export default function Landing() {
         className="p-15 flex-shrink-0 w-[100vw] h-[100vh] bg-[#f6f5f1]"
       >
         <h1 className="mb-[10px] text-[80px] font-bold">Sign in</h1>
-        <div className="mb-[50px] text-[17px] opacity-60">One step closer to financial freedom</div>
+        <div className="mb-[50px] text-[17px] opacity-60">Take the first step towards financial freedom!</div>
         <LoginForm />
       </section>
     </main>
